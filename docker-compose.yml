@@ -1,0 +1,10 @@
+services:
+  orange-apple-assistant-web:
+    build: .
+    container_name: orange-apple-assistant-web
+    env_file:
+      - path: .env
+        required: false
+    ports:
+      - "5000:5000"
+    restart: unless-stopped
