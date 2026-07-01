@@ -26,6 +26,7 @@ cp .env.example .env
 填入需要的 key：
 
 ```env
+PORT=8080
 AI_MODEL=gpt-5.4-mini
 AI_PROVIDER_ORDER=ikuncode,openai
 
@@ -44,13 +45,13 @@ OPENAI_BASE_URL=
 python -m venv .venv
 .venv\Scripts\activate
 pip install -r requirements.txt
-flask --app app run --host 0.0.0.0 --port 5000 --debug
+flask --app app run --host 0.0.0.0 --port 8080 --debug
 ```
 
 開啟：
 
 ```text
-http://localhost:5000
+http://localhost:8080
 ```
 
 ## Docker 啟動
@@ -62,15 +63,19 @@ docker compose up --build
 開啟：
 
 ```text
-http://localhost:5000
+http://localhost:8080
 ```
 
 也可以直接用 Docker：
 
 ```bash
 docker build -t orange-apple-assistant-web .
-docker run --rm --env-file .env -p 5000:5000 orange-apple-assistant-web
+docker run --rm --env-file .env -p 8080:8080 orange-apple-assistant-web
 ```
+
+## Zeabur
+
+Dockerfile 預設監聽 `8080`，也支援 Zeabur 注入的 `PORT` 環境變數。若 Zeabur 公網路由綁到容器 `:8080`，不需要另外改程式。
 
 ## 專案結構
 
