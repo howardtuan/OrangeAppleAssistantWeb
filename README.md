@@ -1,7 +1,7 @@
 # OrangeAppleAssistantWeb
 
 Flask web 版學生聯絡簿產生器，移植自 `howardtuan/OrangeAppleAssistant`。保留原桌面版的課程資料、題庫抽題、聯絡簿文字規則與 AI 潤飾流程，不需要資料庫。
-
+![alt text](image.png)
 ## 功能
 
 - 產生聯絡簿文字，保持文章格式
