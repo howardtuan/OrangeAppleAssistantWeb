@@ -12,7 +12,7 @@ Flask web 版學生聯絡簿產生器，移植自 `howardtuan/OrangeAppleAssista
 - 依目前課程自動抽上一課三題
 - 獨立抽題區，可貼到本堂、貼到上週或複製
 - 產生後嘗試自動複製，並提供手動複製按鈕
-- AI 潤飾，預設先用 iKunCode 的 `gemini-3.8-flash`，連不上或失敗時自動 fallback 到 OpenAI 的 `gpt-5.4-mini`
+- AI 潤飾，第一組 iKunCode 預設用 `gpt-5.4-mini`，失敗時改用第二組 iKunCode API 呼叫 `gemini-3.8-flash`，之後才 fallback 到 OpenAI
 - RWD 單頁介面，桌面三欄、平板/手機自動重排
 
 ## 環境變數
@@ -27,20 +27,24 @@ cp .env.example .env
 
 ```env
 PORT=8080
-AI_PROVIDER_ORDER=ikuncode,openai
+AI_PROVIDER_ORDER=ikuncode,ikuncode_fallback,openai
 
 IKUNCODE_API_KEY=your-ikuncode-key
 IKUNCODE_BASE_URL=https://api.ikuncode.cc/v1
-IKUNCODE_MODEL=gemini-3.8-flash
+IKUNCODE_MODEL=gpt-5.4-mini
+
+IKUNCODE_FALLBACK_API_KEY=your-second-ikuncode-key
+IKUNCODE_FALLBACK_BASE_URL=https://api.ikuncode.cc/v1
+IKUNCODE_FALLBACK_MODEL=gemini-3.8-flash
 
 OPENAI_API_KEY=your-openai-key
 OPENAI_BASE_URL=
 OPENAI_MODEL=gpt-5.4-mini
 ```
 
-`AI_PROVIDER_ORDER=ikuncode,openai` 表示先呼叫 iKunCode；如果 iKunCode 未設定、連線失敗或 API 回傳錯誤，會自動改用 OpenAI。
+`AI_PROVIDER_ORDER=ikuncode,ikuncode_fallback,openai` 表示先用第一組 iKunCode API，失敗後用第二組 iKunCode API，兩組都失敗才改用 OpenAI。舊的 `AI_PROVIDER_ORDER=ikuncode,openai` 也會自動插入 iKunCode 備援。
 
-`IKUNCODE_MODEL` 與 `OPENAI_MODEL` 可分別指定各供應商的模型，避免 OpenAI fallback 誤用 Gemini 的模型名稱。舊版的 `AI_MODEL` 仍可當作共用備援設定，但供應商專屬設定優先。
+`IKUNCODE_API_KEY` 與 `IKUNCODE_FALLBACK_API_KEY` 是不同的密鑰，也可分別設定 base URL。舊版的 `AI_MODEL` 仍可在主 iKunCode 或 OpenAI 未設專屬模型時使用；Gemini 備援固定由 `IKUNCODE_FALLBACK_MODEL` 控制。
 
 ## 本機啟動
 
