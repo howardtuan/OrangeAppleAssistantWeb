@@ -20,6 +20,8 @@ class ProviderConfig:
     label: str
     api_key_env: str
     base_url_env: str
+    model_env: str
+    default_model: str
     default_base_url: str | None = None
 
 
@@ -29,6 +31,8 @@ PROVIDERS = {
         label="iKunCode",
         api_key_env="IKUNCODE_API_KEY",
         base_url_env="IKUNCODE_BASE_URL",
+        model_env="IKUNCODE_MODEL",
+        default_model="gemini-3.8-flash",
         default_base_url="https://api.ikuncode.cc/v1",
     ),
     "openai": ProviderConfig(
@@ -36,6 +40,8 @@ PROVIDERS = {
         label="OpenAI",
         api_key_env="OPENAI_API_KEY",
         base_url_env="OPENAI_BASE_URL",
+        model_env="OPENAI_MODEL",
+        default_model="gpt-5.4-mini",
     ),
 }
 
@@ -53,6 +59,12 @@ def _safe_error(exc):
     return f"{exc.__class__.__name__}: {message}"
 
 
+def _provider_model(provider):
+    provider_model = os.getenv(provider.model_env, "").strip()
+    legacy_model = os.getenv("AI_MODEL", "").strip()
+    return provider_model or legacy_model or provider.default_model
+
+
 def configured_providers():
     result = []
     for key in _provider_order():
@@ -63,6 +75,7 @@ def configured_providers():
                 "label": provider.label,
                 "configured": bool(os.getenv(provider.api_key_env)),
                 "baseUrl": os.getenv(provider.base_url_env, provider.default_base_url or ""),
+                "model": _provider_model(provider),
             }
         )
     return result
@@ -86,11 +99,11 @@ def _make_client(provider):
 
 
 def polish_contact_book(draft):
-    model = os.getenv("AI_MODEL", "gpt-5.4-mini")
     errors = []
 
     for key in _provider_order():
         provider = PROVIDERS[key]
+        model = _provider_model(provider)
         client = _make_client(provider)
         if client is None:
             errors.append(f"{provider.label}: 未設定 {provider.api_key_env}")
